@@ -171,7 +171,12 @@
 	}
 	$(function () {
 		$("#registerForm").submit(function () {
-			return  checkUsername() && checkPassword() && checkEmail()
+			if (checkUsername() && checkPassword() && checkEmail()) {
+				$.post("registerUserServlet",$(this).serialize(),function (data) {
+
+				})
+			}
+			return  false;
 			// 如果这个方法没有返回值，或者返回为true，则表单提交；如果返回为false，则表单不提交
 		})
 		$("#username").blur(checkUsername)// 这个地方要注意，括号不要加。这个地方是一个function对象，相当于传了一个名字
