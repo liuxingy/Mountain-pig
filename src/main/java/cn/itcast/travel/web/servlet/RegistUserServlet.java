@@ -12,9 +12,12 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
+import java.util.Set;
+import java.util.SplittableRandom;
 
 /**
  * @author liuxy
@@ -28,6 +31,21 @@ public class RegistUserServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // 1.获取数据
         Map<String, String[]> map = req.getParameterMap();
+        String check = req.getParameter("check");
+        HttpSession session = req.getSession();
+        String checkcode_server = (String) session.getAttribute("CHECKCODE_SERVER");
+        session.removeAttribute("CHECKCODE_SERVER");
+        if (checkcode_server == null || !checkcode_server.equalsIgnoreCase(check)) {
+            ResultInfo info = new ResultInfo();
+            info.setFlag(false);
+            info.setErrorMsg("验证码错误");
+            ObjectMapper ob = new ObjectMapper();
+            String json = ob.writeValueAsString(info);
+            // 将json写回客户端
+            resp.setContentType("application/json;charset=utf-8");
+            resp.getWriter().write(json);
+            return;
+        }
         // 2.封装对象
         User user = new User();
         try {
@@ -46,7 +64,7 @@ public class RegistUserServlet extends HttpServlet {
           info.setFlag(true);
         } else {
             info.setFlag(false);
-            info.setErrorMsg("注册失败");
+            info.setErrorMsg("注册失败,用户名不能重复");
         }
         // 将info对象序列化为json，并且写回客户端
         ObjectMapper ob = new ObjectMapper();
