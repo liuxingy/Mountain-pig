@@ -14,6 +14,6 @@ import cn.itcast.travel.domain.Route;
  * 线路Service
  */
 public interface RouteService {
-    PageBean<Route> pageQuery(int cid,int currentPage,int PageSize);
+    PageBean<Route> pageQuery(int cid,int currentPage,int PageSize,String ranme);
 
 }
