@@ -92,5 +92,18 @@ public class RouteServlet extends BaseServlet{
         writeValue(flag,resp);
     }
 
+    public void addFavorite(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String rid = req.getParameter("rid");
+        // 获取当前登录的用户
+        User user = (User) req.getSession().getAttribute("user");
+        int uid;     // 用户id
+        if (user == null) {
+           return;
+        } else {
+            uid = user.getUid();
+        }
+        favoriteService.add(rid,uid);
+    }
+
 
 }

@@ -19,4 +19,9 @@ public class FavoriteServiceImpl implements FavoriteService {
 
         return favorite != null; // 这是一个布尔类型的值，如果对象有值，则为true；反之，则为false
     }
+
+    @Override
+    public void add(String rid, int uid) {
+        favoriteDao.add(Integer.parseInt(rid),uid);
+    }
 }
