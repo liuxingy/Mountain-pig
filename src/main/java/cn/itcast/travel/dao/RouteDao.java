@@ -20,6 +20,6 @@ public interface RouteDao {
      */
     List<Route> findByPage(int cid ,int start, int pageSize,String rname);
 
-
+    Route findOne(int rid);
 
 }

@@ -28,7 +28,7 @@ public class RouteDaoImpl implements RouteDao {
             sb.append(" and cid = ? ");
             params.add(cid);  // 添加？对应的值
         }
-        if (rname != null && rname.length() > 0) {
+        if (rname != null && rname.length() > 0 && !"null".equals(rname)) {
             sb.append(" and rname like ? ");
             params.add("%" + rname + "%");
         }
@@ -46,7 +46,7 @@ public class RouteDaoImpl implements RouteDao {
             sb.append(" and cid = ? ");
             params.add(cid);  // 添加？对应的值
         }
-        if (rname != null && rname.length() > 0) {
+        if (rname != null && rname.length() > 0 && !"null".equals(rname)) {
             sb.append(" and rname like ? ");
             params.add("%" + rname + "%");
         }
@@ -55,5 +55,11 @@ public class RouteDaoImpl implements RouteDao {
         params.add(start);
         params.add(pageSize);
         return jdbcTemplate.query(sql,new BeanPropertyRowMapper<>(Route.class),params.toArray());
+    }
+
+    @Override
+    public Route findOne(int rid) {
+        String sql = "select * from tab_route where rid = ?";
+        return jdbcTemplate.queryForObject(sql,new BeanPropertyRowMapper<>(Route.class),rid);
     }
 }
