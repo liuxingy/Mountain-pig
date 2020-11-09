@@ -5,10 +5,109 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>黑马旅游-搜索</title>
+    <title>小山猪旅游-搜索</title>
     <link rel="stylesheet" type="text/css" href="css/common.css">
     <link rel="stylesheet" href="css/search.css">
     <script src="js/jquery-3.3.1.js"></script>
+    <script src="js/getParameter.js"></script>
+    <script>
+        $(function () {
+           /* let search = location.search
+            let cid = search.split("=")[1]*/
+            let cid = getParameter("cid")
+            let rname = getParameter("rname");
+            if (rname) {
+                rname = window.decodeURIComponent(rname)
+            }
+            // 当页面加载完成之后，调用load方法，发送ajax请求数据
+            load(cid,null,rname)
+        })
+        function load(cid,currentPage,rname) {
+            $.get("route/pageQuery",{cid:cid,currentPage:currentPage,rname:rname},function (pb) {
+                $("#totalPage").html(pb.totalPage)
+                $("#totalCount").html(pb.totalCount)
+                let lis = ""
+                let fristPage = '<li onclick="javascript:load('+cid+',1,\''+rname+'\')"><a href="javascript:void(0)">首页</a></li>'
+                let beforeNum = pb.currentPage - 1
+                if (beforeNum <= 0) {
+                    beforeNum = 1
+                }
+                let beforePage = '<li onclick="javascript:load('+cid+','+beforeNum+',\''+rname+'\')" class="threeword"><a href="javascript:void(0)">上一页</a></li>'
+                lis += fristPage
+                lis += beforePage
+               /* for (let i = 1; i < pb.totalPage; i++) {
+                    let li;
+                    if (pb.currentPage == i) {
+                        li = '<li class="curPage" onclick="javascript:load('+cid+','+i+')"><a href="javascript:void(0)">'+i+'</a></li>'
+                    } else {
+                        li = '<li onclick="javascript:load('+cid+','+i+')"><a href="javascript:void(0)">'+i+'</a></li>'
+                    }
+                    lis += li
+                }*/
+                let lastNum = pb.currentPage + 1
+                if (lastNum >= pb.totalPage) {
+                    lastNum = pb.currentPage
+                }
+                let begin;
+                let end;
+                if (pb.totalPage < 10) {
+                    begin = 1
+                    end = pb.totalPage
+                } else {
+                    begin = pb.currentPage - 5
+                    end = pb.currentPage + 4
+                    if (begin < 1) {
+                        begin = 1
+                        end = begin + 9
+                    }
+                    if (end > pb.totalPage) {
+                        end = pb.totalPage
+                        begin = end - 9
+                    }
+                }
+                for (let i = begin; i <= end ; i++) {
+                    let li;
+                    if (pb.currentPage == i) {
+                        li = '<li class="curPage" onclick="javascript:load('+cid+','+i+',\''+rname+'\')"><a href="javascript:void(0)">'+i+'</a></li>'
+                    } else {
+                        li = '<li onclick="javascript:load('+cid+','+i+',\''+rname+'\')"><a href="javascript:void(0)">'+i+'</a></li>'
+                    }
+                    lis += li
+                }
+                let lastPage = '<li onclick="javascript:load('+cid+',103)"  class="threeword"><a href="javascript:;">末页</a></li>'
+                let prePage = ' <li onclick="javascript:load('+cid+','+lastNum+')"  class="threeword"><a href="javascript:;">下一页</a></li>'
+                lis += lastPage
+                lis += prePage
+                $("#pageNum").html(lis)
+
+                let route_lis = ""
+                for (let i = 0; i < pb.list.length; i++) {
+                    let route = pb.list[i]
+                    let li = ' <li>\n' +
+                        '  <div class="img"><img src="'+route.rimage+'" style="width: 299px "></div>\n' +
+                        '  <div class="text1">\n' +
+                        '      <p>'+route.rname+'</p>\n' +
+                        '      <br/>\n' +
+                        '      <p>'+route.routeIntroduce+'</p>\n' +
+                        '  </div>\n' +
+                        '  <div class="price">\n' +
+                        '      <p class="price_num">\n' +
+                        '          <span>&yen;</span>\n' +
+                        '          <span>'+route.price+'</span>\n' +
+                        '          <span>起</span>\n' +
+                        '      </p>\n' +
+                        '      <p><a href="route_detail.html?rid='+route.rid+'">查看详情</a></p>\n' +
+                        '  </div>'
+                    route_lis += li
+                }
+                $("#route").html(route_lis)
+                // 定位到页面的顶部
+                window.scrollTo(0,0)
+
+            })
+
+        }
+    </script>
 </head>
 <body>
 <!--引入头部-->
@@ -17,7 +116,7 @@
         <div class="contant">
             <div class="crumbs">
                 <img src="images/search.png" alt="">
-                <p>黑马旅行><span>搜索结果</span></p>
+                <p>小山猪旅行><span>搜索结果</span></p>
             </div>
             <div class="xinxi clearfix">
                 <div class="left">
@@ -25,7 +124,7 @@
                         <span>商品信息</span>
                         <span class="jg">价格</span>
                     </div>
-                    <ul>
+                    <ul id="route">
                         <li>
                             <div class="img"><img src="images/04-search_03.jpg" alt=""></div>
                             <div class="text1">
@@ -157,13 +256,13 @@
                     </ul>
                     <div class="page_num_inf">
                         <i></i> 共
-                        <span>12</span>页<span>132</span>条
+                        <span id="totalPage">12</span>页<span id="totalCount">132</span>条
                     </div>
                     <div class="pageNum">
-                        <ul>
+                        <ul id="pageNum">
                             <li><a href="">首页</a></li>
                             <li class="threeword"><a href="#">上一页</a></li>
-                            <li><a href="#">1</a></li>
+                            <li class="curPage"><a href="#">1</a></li>
                             <li><a href="#">2</a></li>
                             <li><a href="#">3</a></li>
                             <li><a href="#">4</a></li>
